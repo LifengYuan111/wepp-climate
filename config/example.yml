@@ -1,0 +1,10 @@
+# Example only. Replace every path with locations on your own machine.
+# WEPP itself is NOT distributed with this repository.
+
+wepp_executable: "C:/path/to/WEPP/wepp_executable.exe"
+management_dir: "C:/path/to/project/managements"
+climate_dir: "C:/path/to/project/climates/GPCC-NO-SI/Present"
+output_dir: "C:/path/to/project/results/example"
+slope_file: "C:/path/to/project/inputs/example.slp"
+soil_file: "C:/path/to/project/inputs/example.sol"
+years: 100

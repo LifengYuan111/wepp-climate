@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this research software, please cite this repository and the relevant associated publication(s)."
+title: "WEPP-Climate: R and Python Workflows for Climate-Change Impact Analysis"
+type: software
+version: 0.1.0
+authors:
+  - family-names: "Yuan"
+    given-names: "Lifeng"
+    orcid: "https://orcid.org/0000-0002-5655-1026"

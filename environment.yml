@@ -1,0 +1,9 @@
+name: wepp-climate
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10
+  - pyyaml>=6
+  - r-base>=4.2
+  - r-tidyverse
+  - r-rlang
