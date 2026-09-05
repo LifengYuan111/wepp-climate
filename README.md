@@ -17,14 +17,9 @@ ensemble summaries, crop-yield analysis, and runoff/soil-loss analysis.
 
 ## Important note on storm intensification
 
-`SI` and `NO-SI` are **alternative projected climate-forcing branches produced
-by the original climate projection/downscaling workflow**. This repository does
-**not** implement or claim to reconstruct a user-defined storm-intensification
-formula inside WEPP or the Python runner.
-
-The WEPP automation consumes climate files that already represent the projected
-SI/NO-SI alternatives. The exact underlying projection algorithm belongs to the
-original climate-generation methodology and is not reimplemented here.
+storm intensification is incorporated during GPCC climate downscaling by 
+modifying precipitation-distribution parameters—especially variance and 
+skewness—with skewness related linearly to the 99.9th-percentile/mean precipitation ratio.
 
 ## Repository structure
 
