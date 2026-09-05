@@ -64,7 +64,7 @@ Phase 7B also hardens:
 
 and adds:
 
-- 	ests/test_r_base_helpers.R
+- tests/test_r_base_helpers.R
 
 The precipitation helper now computes the study-relevant 90th, 95th, 99th and
 99.9th percentiles explicitly rather than accepting a custom probability vector
@@ -73,7 +73,7 @@ NA group values more safely.
 
 ## R syntax validation
 
-Rscript detected at $rscript. Portable modules and historical scripts were parse-checked; see the parse CSV.
+Rscript detected at C:\Program Files\R\R-4.5.1\bin\Rscript.exe. Portable modules and historical scripts were parse-checked; see the parse CSV.
 
 Historical parser failures, if any:
 
