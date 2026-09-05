@@ -3,11 +3,14 @@
 # Original relative path: SYNTOR-NO-SI\sumry_out(all).R
 # Source SHA256: 39D8FF06C2292EFF1020B8E7969FF19ECD3EC66ECB966C8E4FA95E96AA51305A
 #
-# This is a sanitized copy recovered from the historical WEPP research workspace.
-# Machine-specific absolute paths and email addresses were redacted.
-# The scientific statements/calculations were otherwise retained as historical
-# evidence. This file is not guaranteed to run without reconstructing its
-# historical data objects, package versions, and upstream workflow state.
+# Sanitized copy recovered from the historical WEPP research workspace.
+# Machine-specific Windows absolute paths and email addresses were redacted.
+# R regular-expression strings are preserved exactly; they are not interpreted
+# as UNC/network paths.
+#
+# Scientific statements/calculations are retained as historical provenance.
+# This script may require historical data objects, working directories,
+# package versions, and upstream workflow state that are not distributed here.
 # ============================================================================
 ## deal with sumry out from wepp
 sumry <- read.table('..//..//output//result analysis//sum_out_pres.txt',header = F,sep = '',

@@ -3,11 +3,14 @@
 # Original relative path: SYNTOR-NO-SI\crp_f2r8.R
 # Source SHA256: 1565589DBE4B64861D1636921F56432D906937599A402FE99FCDDF5192FF43CF
 #
-# This is a sanitized copy recovered from the historical WEPP research workspace.
-# Machine-specific absolute paths and email addresses were redacted.
-# The scientific statements/calculations were otherwise retained as historical
-# evidence. This file is not guaranteed to run without reconstructing its
-# historical data objects, package versions, and upstream workflow state.
+# Sanitized copy recovered from the historical WEPP research workspace.
+# Machine-specific Windows absolute paths and email addresses were redacted.
+# R regular-expression strings are preserved exactly; they are not interpreted
+# as UNC/network paths.
+#
+# Scientific statements/calculations are retained as historical provenance.
+# This script may require historical data objects, working directories,
+# package versions, and upstream workflow state that are not distributed here.
 # ============================================================================
 ## deal with crop out from wepp
 crop <- read.csv('<LOCAL_PATH_REDACTED>',header = F,sep = ':',
@@ -37,7 +40,7 @@ crop %>% mutate(Tillage = case_when(
     grepl('-wt',Name) ~ 'Wt',
     TRUE ~ 'None'),
   GCM = str_extract(Name,'([:upper:]{2,3}|[:upper:]{1}\\d{1})_[:upper:]{1}'),
-  Harvest = as.numeric(str_extract(Product,'<NETWORK_PATH_REDACTED>')),
+  Harvest = as.numeric(str_extract(Product,'\\d{2,3}')),
   Yield = as.numeric(str_extract_all(Product,'0\\.\\d{3}')),
   Yearly_Yield = ifelse(grepl('-a_',Name) & (Harvest >= 100),round(Yield*Harvest/(100-33),3),Yield),
   Total_yield = Yearly_Yield * 80 * 200,

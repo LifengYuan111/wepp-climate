@@ -3,11 +3,14 @@
 # Original relative path: GPCC-NO-SI\Table 5.R
 # Source SHA256: E1C5F753FADB89E85844B0D2217C9C9AA501270A45FA5FCCF8FA5F4C11246CE2
 #
-# This is a sanitized copy recovered from the historical WEPP research workspace.
-# Machine-specific absolute paths and email addresses were redacted.
-# The scientific statements/calculations were otherwise retained as historical
-# evidence. This file is not guaranteed to run without reconstructing its
-# historical data objects, package versions, and upstream workflow state.
+# Sanitized copy recovered from the historical WEPP research workspace.
+# Machine-specific Windows absolute paths and email addresses were redacted.
+# R regular-expression strings are preserved exactly; they are not interpreted
+# as UNC/network paths.
+#
+# Scientific statements/calculations are retained as historical provenance.
+# This script may require historical data objects, working directories,
+# package versions, and upstream workflow state that are not distributed here.
 # ============================================================================
 data <- read.csv('Table5-SYNTOR-SI.csv')
 data

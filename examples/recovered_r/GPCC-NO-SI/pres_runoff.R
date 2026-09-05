@@ -3,11 +3,14 @@
 # Original relative path: GPCC-NO-SI\pres_runoff.R
 # Source SHA256: 379C1E8AB8A1FFB4A602D4C7A02B5DEB433CCD4F2F06B73E5BACA636A13923FC
 #
-# This is a sanitized copy recovered from the historical WEPP research workspace.
-# Machine-specific absolute paths and email addresses were redacted.
-# The scientific statements/calculations were otherwise retained as historical
-# evidence. This file is not guaranteed to run without reconstructing its
-# historical data objects, package versions, and upstream workflow state.
+# Sanitized copy recovered from the historical WEPP research workspace.
+# Machine-specific Windows absolute paths and email addresses were redacted.
+# R regular-expression strings are preserved exactly; they are not interpreted
+# as UNC/network paths.
+#
+# Scientific statements/calculations are retained as historical provenance.
+# This script may require historical data objects, working directories,
+# package versions, and upstream workflow state that are not distributed here.
 # ============================================================================
 # load event file for baseline, including runoff and soil loss data
 evt_sheets_name_pres <- dir('<LOCAL_PATH_REDACTED>',pattern = 'evt_')

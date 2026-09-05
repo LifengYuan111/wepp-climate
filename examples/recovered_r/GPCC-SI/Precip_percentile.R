@@ -3,11 +3,14 @@
 # Original relative path: GPCC-SI\Precip_percentile.R
 # Source SHA256: DE4A2ACF89D16A4ED10167B19C51403AD7C8EC230827040D589125ED675ECAA0
 #
-# This is a sanitized copy recovered from the historical WEPP research workspace.
-# Machine-specific absolute paths and email addresses were redacted.
-# The scientific statements/calculations were otherwise retained as historical
-# evidence. This file is not guaranteed to run without reconstructing its
-# historical data objects, package versions, and upstream workflow state.
+# Sanitized copy recovered from the historical WEPP research workspace.
+# Machine-specific Windows absolute paths and email addresses were redacted.
+# R regular-expression strings are preserved exactly; they are not interpreted
+# as UNC/network paths.
+#
+# Scientific statements/calculations are retained as historical provenance.
+# This script may require historical data objects, working directories,
+# package versions, and upstream workflow state that are not distributed here.
 # ============================================================================
 rain_sheet_name_f2r8 <- dir('<LOCAL_PATH_REDACTED>')
 dt_f2r8 <- dir('<LOCAL_PATH_REDACTED>',full.names = T) %>% map(read.table,sep='',skip=15,header=F,stringsAsFactors=F)

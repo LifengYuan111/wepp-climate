@@ -3,11 +3,14 @@
 # Original relative path: SYNTOR-SI\cli_rainfal.R
 # Source SHA256: 468E43182151F87D89DFED2D900FA14E897454CE4E95CD8ED985362201EAC651
 #
-# This is a sanitized copy recovered from the historical WEPP research workspace.
-# Machine-specific absolute paths and email addresses were redacted.
-# The scientific statements/calculations were otherwise retained as historical
-# evidence. This file is not guaranteed to run without reconstructing its
-# historical data objects, package versions, and upstream workflow state.
+# Sanitized copy recovered from the historical WEPP research workspace.
+# Machine-specific Windows absolute paths and email addresses were redacted.
+# R regular-expression strings are preserved exactly; they are not interpreted
+# as UNC/network paths.
+#
+# Scientific statements/calculations are retained as historical provenance.
+# This script may require historical data objects, working directories,
+# package versions, and upstream workflow state that are not distributed here.
 # ============================================================================
 
 #rain_sheet_name_f2r8 <- dir('<LOCAL_PATH_REDACTED>')

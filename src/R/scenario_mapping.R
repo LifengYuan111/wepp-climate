@@ -1,7 +1,6 @@
 # Scenario and crop-label helpers for the WEPP climate workflow.
 #
-# These functions expose stable labels recovered from the historical R workflow
-# while avoiding dependence on the original interactive workspace.
+# Stable labels recovered from the historical R workflow.
 
 wepp_scenario_lookup <- function() {
   data.frame(
@@ -36,7 +35,8 @@ normalize_wepp_scenario <- function(x) {
   lookup <- wepp_scenario_lookup()
   idx <- match(x, lookup$code)
   out <- x
-  out[!is.na(idx)] <- lookup$label[idx[!is.na(idx)]]
+  matched <- !is.na(idx)
+  out[matched] <- lookup$label[idx[matched]]
   out
 }
 
@@ -49,7 +49,9 @@ normalize_crop_code <- function(x) {
     "Ca" = "Canola",
     "Sb" = "Soybean"
   )
+
   out <- unname(mapping[x])
-  out[is.na(out)] <- x[is.na(out)]
+  missing <- is.na(out) & !is.na(x)
+  out[missing] <- x[missing]
   out
 }
