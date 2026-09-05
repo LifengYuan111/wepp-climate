@@ -1,0 +1,171 @@
+# ============================================================================
+# RECOVERED HISTORICAL RESEARCH SCRIPT
+# Original relative path: SYNTOR-SI\climate data analysis.Rmd
+# Source SHA256: 88C873035DC51F156AF5D099381752AF8499E24B3AE96FA6E5AE0A6C0765F24D
+#
+# This is a sanitized copy recovered from the historical WEPP research workspace.
+# Machine-specific absolute paths and email addresses were redacted.
+# The scientific statements/calculations were otherwise retained as historical
+# evidence. This file is not guaranteed to run without reconstructing its
+# historical data objects, package versions, and upstream workflow state.
+# ============================================================================
+---
+title: "Precipitation Analysis"
+author: "Lifeng Yuan"
+date: "Nov. 2020"
+output: html_document
+contact: <EMAIL_REDACTED>
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This R script was developed to analyze some basic elements for climate change,such as precipitation, maximum and minimum temperature by monthly or yearly.It supports the WEPP project at USDA-ARS Grazinglands Research Center, El Reno,Oklahoma.                                               
+# Setting the working directory and load working packages
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+getwd()
+setwd("<LOCAL_PATH_REDACTED>")
+library(readxl)
+library(openxlsx)
+library(tidyverse)
+library(hydroTSM)
+library(zoo)
+```
+
+## This block code is conducted to read in the excel file
+
+Get the name of each sheet in a excel file, read each sheet in a entire excel file,names the entire workbook by different names of sheets, and create a new variable with a simple name to store the entire.workbook
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+sheets_name <- openxlsx::getSheetNames('<LOCAL_PATH_REDACTED>')
+entire.workbook <- lapply(excel_sheets('Future2_RCP45.xlsx'),function (x) read_excel(path='Future2_RCP45.xlsx',sheet = x,skip=14))
+names(entire.workbook) <- sheets_name
+cli <- entire.workbook
+cli
+```
+Only read in precipitation, maximum and minimum temperature in the 'cli' list
+```{r}
+for (i in 1:length(cli)){
+  cli[[i]] <- as.data.frame(cli[[i]])
+  cli[[i]] <- cli[[i]][,c(1,2,3,4,8,9)]  
+  colnames(cli[[i]]) <- c('day','mon','year','prcp','tmax','tmin')
+}
+```
+
+## Summary monthly and yearly precipitation,and write them into 'cli' data frame
+Note:
+monthly precipitation amount were calculated by summarize all daily precipitation in that month;
+yearly precipitation amount were calculated by summarize all monthly precipitation in that year;
+average monthly maximum temperature were calculated by adding daily maximum temperature for a month then dividing the number of days in a month;
+average yearly maximum temperature were calculated by adding monthly maximum temperature for a year then dividing 12 months;
+average monthly minimum temperature were calculated by adding daily minimum temperature for a month then dividing the number of days in a month;
+average yearly minimum temperature were calculated by adding monthly minimum temperature for a year then dividing 12 months.
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+for (i in 1:length(cli)){
+  cli[[i]] %>% group_by(mon,year) %>%
+    mutate(prcp_mon = sum(prcp)) -> cli[[i]]
+  cli[[i]] %>% group_by(year) %>%
+    mutate(prcp_year = sum(prcp)) -> cli[[i]]
+  cli[[i]] %>% group_by(mon,year) %>%
+    mutate(avg_tmax_mon = sum(tmax)/n()) -> cli[[i]]
+  cli[[i]] %>% group_by(year) %>%
+    mutate(avg_tmax_year = sum(tmax)/n()) -> cli[[i]]
+  cli[[i]] %>% group_by(mon,year) %>%
+    mutate(avg_tmin_mon = sum(tmin)/n()) -> cli[[i]]
+  cli[[i]] %>% group_by(year) %>%
+    mutate(avg_tmin_year = sum(tmin)/n()) -> cli[[i]]
+}
+```
+# Build a null excel workbook and write all summary with the corresponding sheet names
+```{r echo=TRUE}
+wb <- createWorkbook()
+for (i in 1:26) {
+  addWorksheet(wb,sheets_name[i])
+  writeDataTable(wb,i,cli[[i]])
+}
+```
+```{r echo=FALSE}
+saveWorkbook(wb,file="./Future2_RCP45_sum.xlsx",overwrite = TRUE)
+```
+Showing a summary of GPCC_baseline for an example
+```{r}
+summary(cli[[1]])
+```
+
+Adding a date column into the 'cli' for further analysis. I assume that the start date is from 2005-01-01 for the present climate baseline although its first day could be any day during 2005-01-01 to 2019-01-01. 
+
+```{r}
+for (i in 1:26){
+  print(paste(names(cli[i]),"sheet has: ",nrow(cli[[i]]),' rows'))
+  if (i == 1){
+    myDate <- data.frame(date = seq(as.Date('2005/1/1'),as.Date('2104/12/7'),'days'))
+    cli[[1]] <- data.frame(myDate,cli[[1]])
+  } else {
+    myDate <- data.frame(date = seq(as.Date('2021/1/1'),as.Date('2120/12/7'),'days'))
+    cli[[i]] <- data.frame(myDate,cli[[i]])
+  }
+}
+```
+# Precipitation and temperature analysis
+Building a list only including 'date' and 'precipitation'
+```{r include=FALSE}
+myList <- list()
+for (i in 1:26){
+  myList[[i]] <- cli[[i]][,c('date','prcp')]
+}
+names(myList) <- sheets_name
+names(myList)
+```
+Plotting monthly and annual hydrology 
+```{r include=FALSE}
+for (i in 1:26){
+  z <- read.zoo(myList[[i]])
+  m <- daily2monthly(z,FUN = sum)
+  # x <- window(z,start = as.Date('2055-01-01'))
+  hydroplot(m,var.type = 'Precipitation', main=sheets_name[i],
+            pfreq = 'ma')
+}
+```
+## Showing monthly and annual time series precipitation of GPCC_baseline for an example
+```{r}
+hydroplot(m,var.type = 'Precipitation', main=sheets_name[1],
+            pfreq = 'ma')
+```
+Building a list including 'date','precipitation','maximum temperature', and 'minimum temperature'
+```{r include=FALSE}
+cli1 <- list()
+for (i in 1:26){
+  cli1[[i]] <- cli[[i]][,c('date','prcp','tmax','tmin')]
+  pcp <- read.zoo(cli1[[i]][,c(1,2)])
+  tmx <- read.zoo(cli1[[i]][,c(1,3)])
+  tmn <- read.zoo(cli1[[i]][,c(1,4)])
+  m <- climograph(pcp=pcp,tmx=tmx,tmn=tmn,
+                  na.rm = TRUE,main = paste('Climograph at',sheets_name[i]))
+}
+```
+Showing the first 50 rows in a cli1[[15]]
+```{r}
+head(cli[[15]],50)
+```
+
+# Showing one climograph for an example
+```{r}
+
+pcp <- read.zoo(cli1[[26]][,c(1,2)])
+tmx <- read.zoo(cli1[[26]][,c(1,3)])
+tmn <- read.zoo(cli1[[26]][,c(1,4)])
+m <- climograph(pcp=pcp,tmx=tmx,tmn=tmn,na.rm = TRUE,main =   paste('Climograph at',sheets_name[26]))
+```
+# Plotting monthly precipitation for years
+```{r}
+z <- read.zoo(cli[[2]][,c(1,2)])
+m <- daily2monthly(z,FUN = sum)
+M <- matrix(m, ncol=12, byrow=TRUE)
+colnames(M) <- month.abb
+rownames(M) <- unique(format(time(m),'%Y'))
+require(lattice)
+print(matrixplot(M, ColorRamp = 'Precipitation',
+                 main = 'Monthly precipitation at WEATHERFORD OK,[mm/month]'))
+```
+

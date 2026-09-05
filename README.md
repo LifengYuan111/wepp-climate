@@ -1,4 +1,4 @@
-﻿# WEPP-Climate
+# WEPP-Climate
 
 **R and Python workflows for climate-change impact analysis with WEPP**
 
@@ -132,8 +132,26 @@ not claim end-to-end reproduction of every published figure because the
 original large climate datasets, modified model executables, and some
 model-specific inputs are not redistributed.
 
-## Author
+<!-- PHASE7_R_CODE_START -->
+## R analysis code
 
+The repository includes both portable R modules and recovered historical
+research scripts.
+
+Portable modules are under [`src/R/`](src/R/), including climate processing,
+crop-yield analysis, runoff/soil-loss helpers, scenario mapping, extreme
+precipitation statistics, and ensemble summaries.
+
+Representative historical GPCC/SYNTOR analysis scripts are available under
+[`examples/recovered_r/`](examples/recovered_r/). These sanitized scripts show
+the original research workflow for GCM ensembles, SI/NO-SI comparisons,
+crop/tillage analysis, WEPP event extraction, runoff, soil loss, crop yield,
+statistics, figures, and publication tables.
+
+See [`docs/R_CODE_INDEX.md`](docs/R_CODE_INDEX.md) for the detailed code index.
+<!-- PHASE7_R_CODE_END -->
+
+## Author
 **Lifeng Yuan, Ph.D.**
 
 ## License status
