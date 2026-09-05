@@ -17,9 +17,7 @@ ensemble summaries, crop-yield analysis, and runoff/soil-loss analysis.
 
 ## Important note on storm intensification
 
-storm intensification is incorporated during GPCC climate downscaling by 
-modifying precipitation-distribution parameters—especially variance and 
-skewness—with skewness related linearly to the 99.9th-percentile/mean precipitation ratio.
+Storm intensification was incorporated during the GPCC downscaling process rather than added manually within the WEPP automation. GPCC adjusts projected precipitation-distribution parameters, including variance and skewness, to represent changes in extreme storms. The skewness coefficient is adjusted through a linear relationship with the ratio of the 99.9th-percentile precipitation to mean daily precipitation. The resulting SI climate files are then supplied directly to WEPP.
 
 ## Repository structure
 
