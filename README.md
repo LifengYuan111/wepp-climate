@@ -84,8 +84,6 @@ The workflow is associated with peer-reviewed WEPP climate-impact studies in
 *International Journal of Climatology*. See
 [`docs/PUBLICATIONS.md`](docs/PUBLICATIONS.md).
 
-The 2022 *Water* SWAT–SVR–DWT study is **not part of this repository**.
-
 ## Reproducibility scope
 
 This release exposes the cleaned automation and analysis architecture. It does
