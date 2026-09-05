@@ -1,4 +1,4 @@
-# WEPP-Climate
+﻿# WEPP-Climate
 
 **R and Python workflows for climate-change impact analysis with WEPP**
 
@@ -9,15 +9,63 @@ and agricultural management scenarios.
 
 ## Research workflow
 
-**25 GCMs → RCP4.5 / RCP8.5 → 2021–2050 / 2051–2080 → GPCC / SYNTOR climate forcing → SI / NO-SI branches → crop × tillage systems → WEPP batch simulations → runoff / soil loss / crop yield → statistics and publication outputs**
+**52 CMIP5 downscaled GCM datasets → historical extreme-precipitation screening → 25 selected GCMs → RCP4.5 / RCP8.5 → 2021–2050 / 2051–2080 → GPCC / SYNTOR climate downscaling → SI / NO-SI projected climate forcing → crop × tillage systems → WEPP batch simulations → runoff / soil loss / crop yield → statistics and publication outputs**
 
 The Python layer automates WEPP runs across management × climate combinations.
 The R layer provides reusable functions for climate-scenario processing,
 ensemble summaries, crop-yield analysis, and runoff/soil-loss analysis.
 
-## Important note on storm intensification
+## Storm intensification methodology
 
-Storm intensification was incorporated during the GPCC downscaling process rather than added manually within the WEPP automation. GPCC adjusts projected precipitation-distribution parameters, including variance and skewness, to represent changes in extreme storms. The skewness coefficient is adjusted through a linear relationship with the ratio of the 99.9th-percentile precipitation to mean daily precipitation. The resulting SI climate files are then supplied directly to WEPP.
+Storm intensification was incorporated during the climate downscaling process,
+not manually added inside the WEPP automation.
+
+For the GPCC workflow, 52 CMIP5 downscaled GCM datasets were first evaluated
+against observed daily precipitation at Weatherford, Oklahoma. Historical daily
+precipitation from 1950–2005 was divided into 1950–1979 and 1980–2005. Extreme
+precipitation was grouped into five percentile classes:
+
+- 90–95th percentile
+- 95–98th percentile
+- 98–99th percentile
+- 99–99.9th percentile
+- >99.9th percentile
+
+Percent changes in storm intensification between the two historical periods were
+calculated for both observations and each GCM. The 25 GCMs that most closely
+matched the observed historical trend in extreme precipitation were selected
+for future climate projections.
+
+GPCC then downscaled projected monthly precipitation and temperature to the
+target station using quantile mapping and disaggregated monthly climate to daily
+series using CLIGEN. Changes in extreme storms were represented by adjusting
+daily-precipitation distribution parameters, especially variance and skewness.
+The skewness coefficient was adjusted through a linear relationship with the
+ratio of the 99.9th-percentile precipitation to mean daily precipitation.
+
+The resulting SI/NO-SI climate files were supplied to WEPP. This repository does
+not reimplement the complete GPCC climate-generation software; it documents and
+automates the downstream WEPP simulation and analysis workflow.
+
+## Elevated CO2 treatment
+
+The historical study used a modified WEPP configuration that considered
+atmospheric CO2 effects on evapotranspiration, biomass production, and radiation
+use efficiency.
+
+The atmospheric CO2 concentrations used in the study were:
+
+| Climate condition | CO2 concentration |
+|---|---:|
+| Baseline | 380 ppm |
+| RCP4.5, 2021–2050 | 449 ppm |
+| RCP4.5, 2051–2080 | 515 ppm |
+| RCP8.5, 2021–2050 | 473 ppm |
+| RCP8.5, 2051–2080 | 646 ppm |
+
+Modified WEPP executables and historical model-specific CO2 parameter files are
+not redistributed in this repository.
+>>>>>>> 8adb91e (Document GPCC storm-intensification and CO2 methodology)
 
 ## Repository structure
 
@@ -57,8 +105,8 @@ WEPP, CLIGEN, modified WEPP executables, and other third-party binaries are
 | `F2R4.5` | RCP4.5, 2051–2080 |
 | `F2R8.5` | RCP8.5, 2051–2080 |
 
-The associated studies used ensembles of 25 GCMs and 29 cropping/tillage
-combinations.
+The associated studies used ensembles of 25 selected GCMs and 29
+cropping/tillage combinations.
 
 ## Scientific provenance and validation
 
