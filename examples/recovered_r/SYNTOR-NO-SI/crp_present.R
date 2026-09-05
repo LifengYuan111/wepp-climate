@@ -1,0 +1,216 @@
+# ============================================================================
+# RECOVERED HISTORICAL RESEARCH SCRIPT
+# Original relative path: SYNTOR-NO-SI\crp_present.R
+# Source SHA256: 04394350B1F3A781C2D0CF0E52A4B97B3D13F62CD6069142E8D1C78D8C3EBCFC
+#
+# Sanitized copy recovered from the historical WEPP research workspace.
+# Machine-specific Windows absolute paths and email addresses were redacted.
+# R regular-expression strings are preserved exactly; they are not interpreted
+# as UNC/network paths.
+#
+# Scientific statements/calculations are retained as historical provenance.
+# This script may require historical data objects, working directories,
+# package versions, and upstream workflow state that are not distributed here.
+# ============================================================================
+## deal with crop out from wepp
+crop <- read.csv('<LOCAL_PATH_REDACTED>',header = F,sep = ':',
+                 stringsAsFactors = F)
+crop
+colnames(crop) <- c('Name','Product')
+crop <- as.data.frame(crop)
+crop
+class(crop)
+
+crop %>% mutate(Tillage = case_when(
+  grepl('crp_C',Name) ~ 'CT',
+  grepl('crp_D',Name) ~ 'DT',
+  grepl('crp_N',Name) ~ 'NT',
+  grepl('crp_R',Name) ~ 'RT',
+  TRUE ~ 'None'),
+  Crop = case_when(
+    grepl('-ca-a',Name) ~ 'Ca-alf',
+    grepl('-ca',Name) ~ 'Ca',
+    grepl('-ct-a',Name) ~ 'Ct-alf',
+    grepl('-ct',Name) ~ 'Ct',
+    grepl('-sb-a',Name) ~ 'Sb-alf',
+    grepl('-sb',Name) ~ 'Sb',
+    grepl('-sg-a',Name) ~ 'Sg-alf',
+    grepl('-sg',Name) ~ 'Sg',
+    grepl('-wt-a',Name) ~ 'Wt-alf',
+    grepl('-wt-D',Name) ~ 'Wt_double',
+    grepl('-wt',Name) ~ 'Wt',
+    TRUE ~ 'None'),
+  GCM = 'SYNTOR',
+  Harvest = as.numeric(str_extract(Product,'\\d{2,3}')),
+  Yield = as.numeric(str_extract_all(Product,'0\\.\\d{3}')),
+  Yearly_Yield = ifelse(grepl('-a_',Name) & (Harvest >= 100),round(Yield*Harvest/(100-33),3),Yield),
+  Total_yield = Yearly_Yield * 80 * 200,
+  Climate = c('Baseline')
+) -> crop
+
+str(crop)
+crop
+#write.table(crop,file = 'crop_f1r4.csv',sep = ',',col.names = TRUE,row.names = FALSE)
+crop <- crop %>% mutate(New_Crop = case_when(
+  grepl('-a_',Name) & (Harvest >= 100) ~ 'Alfalfa',
+  grepl('-a_',Name) & (Harvest < 100) ~ str_extract(Crop, '[[:upper:]]{1}[[:lower:]]{1}'),
+  (Crop == 'Wt_double') & (Yield >= 0.1) ~ 'Wt',
+  (Crop == 'Wt_double') & (Yield < 0.1) ~ 'Sb',
+  TRUE ~ Crop
+))
+
+class(crop)
+crop %>% group_by(Climate,GCM,New_Crop) %>%
+  summarise(Yield = mean(Total_yield)) -> crp_pres
+
+crop_yield <- rbind(crp_pres,crp_f1r4,crp_f1r8,crp_f2r4,crp_f2r8)
+crop_yield %>% group_by(Climate,GCM,New_Crop) %>%
+  summarise(Yield = mean(Yield)) -> crop_yield
+
+crop_all <- crop_yield
+crop_all %>% mutate(Crop_name = case_when(
+  New_Crop == 'Alfalfa'~ 'Alfalfa',
+  New_Crop == 'Sg'~'Sorghum',
+  New_Crop == 'Wt'~'Wheat',
+  New_Crop == 'Ct'~'Cotton',
+  New_Crop == 'Ca'~'Canola',
+  New_Crop == 'Sb'~'Soybean',
+  TRUE~ New_Crop
+)) -> crop_all
+
+
+crp_base <- crop_all[which(crop_all$Climate == 'Baseline'),]
+crp_base %>% group_by(New_Crop) %>% mutate(base_crop = mean(Yield)) -> crp_base
+crp_base
+crp_others <- crop_all[!(crop_all$Climate == 'Baseline'),]
+crp_others
+
+# finally plot figure 5 with se bar
+
+library(scales)
+crp_others %>% group_by(Crop_name) %>% 
+  ggplot(aes(x=reorder(Crop_name,-Yield),y=Yield)) +
+  stat_summary(aes(fill=Climate,group=Climate),geom='col',position = 'dodge',
+               fun.y = mean) +
+  stat_summary(aes(group=Climate),geom='errorbar',
+               position = position_dodge(width = 0.9),
+               fun.data = mean_se,width = 0.45)+
+  stat_summary(aes(label=round(..y..,0),group=Climate),geom='text',fun.y= mean,
+               position= position_dodge(width = 0.9),color = 'black',hjust=1.55,vjust=0.5,angle=90) +
+  geom_col(data=crp_base,aes(x=reorder(Crop_name,-base_crop),y=base_crop),
+           position = 'dodge',alpha=0,color='black') +
+  geom_text(data=crp_base,aes(x=reorder(Crop_name,-base_crop),y=base_crop,label=round(..y..,0)),
+            vjust=-0.4,size=4) +
+  xlab('Crop') +
+  labs(y = expression(paste('kg ','ha'^-1,'yr'^-1))) +
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", scientific = FALSE),
+                     limits = c(0,11000),
+                     breaks = seq(0,11000,1000),
+                     expand=c(0,0),
+                     oob = rescale_none) +
+  scale_fill_tron(alpha = 0.5) +
+  theme_bw() +
+  theme( axis.title.x = element_text(size = 13),
+         axis.title.y = element_text(size = 13),
+         axis.text.x = element_text(size = 12,color='black'),
+         axis.text.y = element_text(size = 12,color='black'),
+         legend.title = element_blank(),
+         legend.direction = 'horizontal',
+         legend.position = c(0.97,0.97),
+         legend.justification = c(1,1),
+         legend.text = element_text(size=14),
+         legend.background = element_blank(),
+         axis.line = element_line(color='black'),
+         panel.background = element_blank(),
+         panel.border = element_blank(),
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank()
+  ) 
+ggsave('crop_yield2.tiff',device='tiff',dpi=300)
+
+
+crp_others %>% group_by(Crop_name)%>% summarise(crop = mean(Yield))-> crop_yield_mean
+write.csv(crop_yield_mean,'mean_yield.csv')
+
+crp_others %>% group_by(Crop_name) %>% 
+  ggplot(aes(x=reorder(Crop_name,-Yield),y=Yield)) +
+  stat_summary(aes(fill=Climate,group=Climate),geom='col',position = 'dodge',
+               fun.y = mean) +
+  stat_summary(aes(group=Climate),geom='errorbar',
+               position = position_dodge(width = 0.9),
+               fun.data = mean_se,width = 0.45)+
+  stat_summary(aes(label=round(..y..,0),group=Climate),geom='text',fun.y= mean,
+               position= position_dodge(width = 0.9),color = 'black',hjust=1.55,vjust=0.5,angle=90) +
+  geom_tile(data=crp_base,aes(x=reorder(Crop_name,-base_crop),y=base_crop),
+           position = 'dodge',alpha=0,color='black',fill = 'red') +
+  geom_text(data=crp_base,aes(x=reorder(Crop_name,-base_crop),y=base_crop,label=round(..y..,0)),
+            vjust=-0.4,size=4) +
+  xlab('Crop') +
+  labs(y = expression(paste('kg ','ha'^-1,'yr'^-1))) +
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", scientific = FALSE),
+                     limits = c(0,11000),
+                     breaks = seq(0,11000,1000),
+                     expand=c(0,0),
+                     oob = rescale_none) +
+  scale_fill_ucscgb(alpha = 0.5) +
+  theme_bw() +
+  theme( axis.title.x = element_text(size = 13),
+         axis.title.y = element_text(size = 13),
+         axis.text.x = element_text(size = 12,color='black'),
+         axis.text.y = element_text(size = 12,color='black'),
+         legend.title = element_blank(),
+         legend.direction = 'horizontal',
+         legend.position = c(0.97,0.97),
+         legend.justification = c(1,1),
+         legend.text = element_text(size=14),
+         legend.background = element_blank(),
+         axis.line = element_line(color='black'),
+         panel.background = element_blank(),
+         panel.border = element_blank(),
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank()
+  ) 
+
+
+crp_others %>% group_by(Crop_name) %>% 
+  ggplot(aes(x=reorder(Crop_name,-Yield),y=Yield)) +
+  stat_summary(aes(fill=Climate,group=Climate),geom='col',position = 'dodge',
+               fun.y = mean) +
+  stat_summary(aes(group=Climate),geom='errorbar',
+               position = position_dodge(width = 0.9),
+               fun.data = mean_se,width = 0.45)+
+  stat_summary(aes(label=round(..y..,0),group=Climate),geom='text',fun.y= mean,
+               position= position_dodge(width = 0.9),color = 'black',hjust=1.55,vjust=0.5,angle=90) +
+  geom_segment(aes(x=0.5,xend=1.5,y=10624,yend=10624),color='black') +
+  geom_segment(aes(x=1.5,xend=2.5,y=4342,yend=4342),color='black') +
+  geom_segment(aes(x=2.5,xend=3.5,y=2532,yend=2532),color='black') +
+  geom_segment(aes(x=3.5,xend=4.5,y=893,yend=893),color='black') +
+  geom_segment(aes(x=4.5,xend=5.5,y=1709,yend=1709),color='black') +
+  geom_segment(aes(x=5.5,xend=6.5,y=1820,yend=1820),color='black') +
+  geom_text(data=crp_base,aes(x=reorder(Crop_name,-base_crop),y=base_crop,label=round(..y..,0)),
+            vjust=-0.4,size=4) +
+  xlab('Crop') +
+  labs(y = expression(paste('kg ','ha'^-1,'yr'^-1))) +
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", scientific = FALSE),
+                     limits = c(0,11000),
+                     breaks = seq(0,11000,1000),
+                     expand=c(0,0),
+                     oob = rescale_none) +
+  scale_fill_ucscgb(alpha = 0.5) +
+  theme_bw() +
+  theme( axis.title.x = element_text(size = 13),
+         axis.title.y = element_text(size = 13),
+         axis.text.x = element_text(size = 12,color='black'),
+         axis.text.y = element_text(size = 12,color='black'),
+         legend.title = element_blank(),
+         legend.direction = 'horizontal',
+         legend.position = c(0.97,0.97),
+         legend.justification = c(1,1),
+         legend.text = element_text(size=14),
+         legend.background = element_blank(),
+         axis.line = element_line(color='black'),
+         panel.background = element_blank(),
+         panel.border = element_blank(),
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank()
+  ) 
